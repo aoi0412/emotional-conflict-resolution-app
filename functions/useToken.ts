@@ -51,7 +51,7 @@ const useToken = () => {
       },
     }).encode(secretKey);
     setToken(tmpToken);
-  });
+  }, []);
   return { token };
 };
 

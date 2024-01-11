@@ -1,3 +1,4 @@
+import { userAudioAtom, userVideoAtom } from "@/recoil";
 import {
   LocalAudioStream,
   LocalVideoStream,
@@ -5,13 +6,13 @@ import {
 } from "@skyway-sdk/room";
 import { get } from "http";
 import { use, useEffect, useRef, useState } from "react";
+import { useSetRecoilState } from "recoil";
 
 const useAudioVideo = (token: string | null) => {
   const localVideo = useRef<HTMLVideoElement>(null);
-  const [localStream, setLocalStream] = useState<{
-    audio: LocalAudioStream;
-    video: LocalVideoStream;
-  } | null>(null);
+  const setUserAudio = useSetRecoilState(userAudioAtom);
+  const setUserVideo = useSetRecoilState(userVideoAtom);
+
   useEffect(() => {
     const initialize = async () => {
       if (token == null || localVideo.current == null) return;
@@ -21,7 +22,8 @@ const useAudioVideo = (token: string | null) => {
       stream.video.attach(localVideo.current);
 
       await localVideo.current.play();
-      setLocalStream(stream);
+      setUserAudio(stream.audio);
+      setUserVideo(stream.video);
     };
 
     initialize();
