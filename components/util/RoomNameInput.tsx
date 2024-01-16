@@ -1,7 +1,7 @@
 import { FC, useState } from "react";
 import { useSetRecoilState } from "recoil";
 import { SkyWayContext, SkyWayRoom } from "@skyway-sdk/room";
-import useRoom from "@/functions/useRoom";
+import useRoom from "@/hooks/useRoom";
 
 type Props = {
   token: string | null;

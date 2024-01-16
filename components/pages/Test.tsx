@@ -1,7 +1,7 @@
 "use client";
 
-import useAudioVideo from "@/functions/useAudioVideo";
-import useToken from "@/functions/useToken";
+import useAudioVideo from "@/hooks/useAudioVideo";
+import useToken from "@/hooks/useToken";
 import RoomNameInput from "../util/RoomNameInput";
 
 const Test = () => {

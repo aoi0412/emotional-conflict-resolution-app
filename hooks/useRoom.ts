@@ -8,6 +8,7 @@ import {
 } from "@skyway-sdk/room";
 import { useRef } from "react";
 import { useRecoilValue } from "recoil";
+import { isCorrectUserName } from "../functions/utils";
 
 const useRoom = (token: string | null) => {
   const userAudio = useRecoilValue(userAudioAtom);
@@ -21,6 +22,9 @@ const useRoom = (token: string | null) => {
     }
     if (!myName) {
       alert("名前を入力してください");
+      return;
+    } else if (isCorrectUserName(myName) === false) {
+      alert("名前に使用できない文字が含まれています。(英語で入力してください)");
       return;
     }
     if (!token) {
@@ -44,9 +48,11 @@ const useRoom = (token: string | null) => {
     await tmpMyId.publish(userAudio);
 
     room.publications.forEach((publication) => {
+      console.log("publication", publication);
       subscribe(publication, tmpMyId);
     });
     room.onStreamPublished.add((e) => {
+      console.log("onStreamPublished", e);
       subscribe(e.publication, tmpMyId);
     });
   };
@@ -65,7 +71,6 @@ const useRoom = (token: string | null) => {
     targetElement.current.appendChild(subscribeButton);
     targetElement.current.appendChild(audioElement);
     subscribeButton.onclick = async () => {
-      console.log("myId is", myId);
       if (!myId) {
         alert("ルームに参加してください");
         return;
