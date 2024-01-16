@@ -1,4 +1,5 @@
-import { userAudioAtom, userVideoAtom } from "@/recoil";
+import { isCorrectUserName } from "@/functions/utils";
+import { userMediaStreamAtom } from "@/recoil";
 import {
   LocalP2PRoomMember,
   LocalStream,
@@ -8,11 +9,9 @@ import {
 } from "@skyway-sdk/room";
 import { useRef } from "react";
 import { useRecoilValue } from "recoil";
-import { isCorrectUserName } from "../functions/utils";
 
 const useRoom = (token: string | null) => {
-  const userAudio = useRecoilValue(userAudioAtom);
-  const userVideo = useRecoilValue(userVideoAtom);
+  const userMediaStream = useRecoilValue(userMediaStreamAtom);
   const targetElement = useRef<HTMLDivElement>(null);
 
   const joinInRoom = async (roomName: string, myName: string) => {
@@ -31,7 +30,7 @@ const useRoom = (token: string | null) => {
       alert("トークンを取得してください");
       return;
     }
-    if (!userAudio || !userVideo) {
+    if (!userMediaStream?.audio || !userMediaStream?.video) {
       alert("カメラとマイクの使用を許可してください");
       return;
     }
@@ -45,7 +44,7 @@ const useRoom = (token: string | null) => {
 
     let tmpMyId = await room.join({ name: myName });
 
-    await tmpMyId.publish(userAudio);
+    await tmpMyId.publish(userMediaStream.audio);
 
     room.publications.forEach((publication) => {
       console.log("publication", publication);
@@ -80,7 +79,7 @@ const useRoom = (token: string | null) => {
         alert("音声以外のメディアはサポートしていません");
         return;
       }
-      userAudio?.attach(audioElement);
+      userMediaStream?.audio?.attach(audioElement);
     };
   };
 
