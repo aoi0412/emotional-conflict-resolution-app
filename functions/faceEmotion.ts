@@ -3,7 +3,6 @@ import path from "path";
 // face-api.jsを使う
 export const loadModels = async () => {
   const filePath = path.join(__dirname, "/models");
-  console.log("filePath is", filePath);
   await Promise.all([
     faceapi.nets.tinyFaceDetector.load(filePath),
     faceapi.nets.faceExpressionNet.load(filePath),
@@ -11,6 +10,7 @@ export const loadModels = async () => {
 };
 
 export const faceDetectHandler = async (video: HTMLVideoElement) => {
+  await loadModels();
   const detections = await faceapi
     .detectAllFaces(video, new faceapi.TinyFaceDetectorOptions())
     .withFaceExpressions();

@@ -1,3 +1,5 @@
+import { loadModels } from "@/functions/faceEmotion";
+import { convertAudio } from "@/functions/voiceEmotion";
 import { userMediaStreamAtom } from "@/recoil";
 import {
   LocalAudioStream,
@@ -16,34 +18,30 @@ const useAudioVideo = (token: string | null) => {
   const [mediaRecorder, setMediaRecorder] = useState<MediaRecorder | null>(
     null
   );
-  // const setUserVideo = useSetRecoilState(userVideoAtom);
   const [tmpRecordedAudio, setTmpRecordedAudio] = useState<Blob | null>(null);
   useEffect(() => {
     const initialize = async () => {
-      if (
-        token == null ||
-        localVideo.current == null ||
-        localAudio.current == null
-      )
+      if (token == null || localVideo.current == null) {
         return;
+      }
 
       const stream =
         await SkyWayStreamFactory.createMicrophoneAudioAndCameraStream();
-      stream.video.attach(localVideo.current);
-      stream.audio.attach(localAudio.current);
 
+      stream.video.attach(localVideo.current);
+      // stream.audio.attach(localAudio.current);
       await localVideo.current.play();
       setMediaStream(stream);
+      await loadModels();
     };
 
     initialize();
-  }, [token, localVideo, localAudio]);
+  }, [token, localVideo]);
 
   const startAudioRecord = async () => {
     try {
       // マイクからの新しい MediaStream を取得
       const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
-
       // MediaRecorder をこの MediaStream で初期化
       const recorder = new MediaRecorder(stream);
       recorder.ondataavailable = (event) => {
@@ -52,6 +50,7 @@ const useAudioVideo = (token: string | null) => {
         }
       };
       recorder.start();
+      console.log("Audio recording started");
       setMediaRecorder(recorder);
     } catch (error) {
       console.error("Audio recording error:", error);
@@ -66,12 +65,73 @@ const useAudioVideo = (token: string | null) => {
         // BlobPart[] 型の recordedChunks から Blob を作成
         const blob = new Blob(recordedChunks.current, { type: "audio/webm" });
         setTmpRecordedAudio(blob); // Blob をステートに保存
+        console.log("Audio recording stopped");
         recordedChunks.current = []; // チャンクをリセット
       };
     }
   };
 
-  return { localVideo, localAudio };
+  const downloadAudio = () => {
+    if (tmpRecordedAudio) {
+      const url = URL.createObjectURL(tmpRecordedAudio);
+      const a = document.createElement("a");
+      document.body.appendChild(a);
+      a.style.display = "none";
+      a.href = url;
+      a.download = "audio.webm";
+      a.click();
+      window.URL.revokeObjectURL(url);
+    }
+  };
+
+  const processAudio = () => {
+    if (!tmpRecordedAudio) return;
+    convertAudio(tmpRecordedAudio).catch((e) => console.error(e));
+  };
+
+  const uploadAudio = async () => {
+    if (tmpRecordedAudio) {
+      // Blobを作成
+      const blob = new Blob([tmpRecordedAudio], { type: "audio/wav" });
+
+      // FormDataオブジェクトを作成し、ファイルを追加
+      const formData = new FormData();
+      formData.append("file", blob, "audio.wav");
+
+      // APIのエンドポイントURL
+      const apiUrl = "http://localhost:8000/upload/";
+
+      try {
+        // Fetchを使ってファイルをアップロード
+        const response = await fetch(apiUrl, {
+          method: "POST",
+          body: formData,
+        });
+
+        // レスポンスの確認
+        if (response.ok) {
+          response.json().then((data) => {
+            console.log(data);
+          });
+          console.log("Audio uploaded successfully");
+        } else {
+          console.error("Upload failed");
+        }
+      } catch (error) {
+        console.error("Error uploading the audio", error);
+      }
+    }
+  };
+
+  return {
+    localVideo,
+    localAudio,
+    startAudioRecord,
+    stopAudioRecord,
+    downloadAudio,
+    uploadAudio,
+    processAudio,
+  };
 };
 
 export default useAudioVideo;

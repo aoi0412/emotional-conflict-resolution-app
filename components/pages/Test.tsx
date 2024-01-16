@@ -8,10 +8,23 @@ import { useEffect } from "react";
 
 const Test = () => {
   const { token } = useToken();
-  const { localVideo, localAudio } = useAudioVideo(token);
+  const {
+    localVideo,
+    startAudioRecord,
+    stopAudioRecord,
+    downloadAudio,
+    uploadAudio,
+    processAudio,
+  } = useAudioVideo(token);
+
   return (
     <div>
       <RoomNameInput token={token} />
+      <button onClick={startAudioRecord}>start</button>
+      <button onClick={stopAudioRecord}>stop</button>
+      <button onClick={downloadAudio}>download</button>
+      <button onClick={uploadAudio}>upload</button>
+      <button onClick={processAudio}>process</button>
       <video ref={localVideo} autoPlay playsInline muted />
       <EmotionButton videoRef={localVideo} />
     </div>
