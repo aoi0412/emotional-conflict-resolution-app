@@ -89,47 +89,12 @@ const useAudioVideo = (token: string | null) => {
     convertAudio(tmpRecordedAudio).catch((e) => console.error(e));
   };
 
-  const uploadAudio = async () => {
-    if (tmpRecordedAudio) {
-      // Blobを作成
-      const blob = new Blob([tmpRecordedAudio], { type: "audio/wav" });
-
-      // FormDataオブジェクトを作成し、ファイルを追加
-      const formData = new FormData();
-      formData.append("file", blob, "audio.wav");
-
-      // APIのエンドポイントURL
-      const apiUrl = "http://localhost:8000/upload/";
-
-      try {
-        // Fetchを使ってファイルをアップロード
-        const response = await fetch(apiUrl, {
-          method: "POST",
-          body: formData,
-        });
-
-        // レスポンスの確認
-        if (response.ok) {
-          response.json().then((data) => {
-            console.log(data);
-          });
-          console.log("Audio uploaded successfully");
-        } else {
-          console.error("Upload failed");
-        }
-      } catch (error) {
-        console.error("Error uploading the audio", error);
-      }
-    }
-  };
-
   return {
     localVideo,
     localAudio,
     startAudioRecord,
     stopAudioRecord,
     downloadAudio,
-    uploadAudio,
     processAudio,
   };
 };

@@ -76,7 +76,7 @@ export async function convertAudio(inputBlob: Blob): Promise<void> {
       lastModified: new Date().getTime(),
     });
 
-    const result = voiceEmotion(outputFile);
+    const result = await voiceEmotion(outputFile);
     console.log("result is", result);
     // // Blobとして出力ファイルを作成する
     // const blob = new Blob([data], { type: "audio/wav" });

@@ -13,7 +13,6 @@ const Test = () => {
     startAudioRecord,
     stopAudioRecord,
     downloadAudio,
-    uploadAudio,
     processAudio,
   } = useAudioVideo(token);
 
@@ -23,7 +22,6 @@ const Test = () => {
       <button onClick={startAudioRecord}>start</button>
       <button onClick={stopAudioRecord}>stop</button>
       <button onClick={downloadAudio}>download</button>
-      <button onClick={uploadAudio}>upload</button>
       <button onClick={processAudio}>process</button>
       <video ref={localVideo} autoPlay playsInline muted />
       <EmotionButton videoRef={localVideo} />
