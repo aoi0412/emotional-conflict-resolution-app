@@ -1,28 +1,25 @@
 import { FC, useState } from "react";
-import { useSetRecoilState } from "recoil";
+import { useRecoilValue, useSetRecoilState } from "recoil";
 import { SkyWayContext, SkyWayRoom } from "@skyway-sdk/room";
 import useRoom from "@/hooks/useRoom";
+import { memberTypeAtom, roomDocIdAtom } from "@/recoil";
 
-type Props = {
-  token: string | null;
-};
-
-const RoomNameInput: FC<Props> = ({ token }) => {
-  const [roomName, setRoomName] = useState<string>("");
+const RoomNameInput: FC = () => {
   const [myName, setMyName] = useState<string>("");
-  const { joinInRoom, targetElement } = useRoom(token);
-
+  const { joinInRoom, targetElement } = useRoom();
+  const memberType = useRecoilValue(memberTypeAtom);
+  const roomId = useRecoilValue(roomDocIdAtom);
   const buttonHandler = () => {
-    joinInRoom(roomName, myName);
+    joinInRoom(myName);
   };
   return (
     <div>
-      <input
+      {/* <input
         type="text"
         value={roomName}
         onChange={(e) => setRoomName(e.target.value)}
         placeholder="ルーム名を入力してください"
-      />
+      /> */}
       <input
         type="text"
         value={myName}

@@ -1,6 +1,11 @@
 import { loadModels } from "@/functions/faceEmotion";
-import { convertAudio } from "@/functions/voiceEmotion";
-import { userMediaStreamAtom } from "@/recoil";
+import { DetectVoiceEmotion } from "@/functions/voiceEmotion";
+import {
+  currentTimeAtom,
+  memberTypeAtom,
+  roomTokenAtom,
+  userMediaStreamAtom,
+} from "@/recoil";
 import {
   LocalAudioStream,
   LocalVideoStream,
@@ -8,9 +13,10 @@ import {
 } from "@skyway-sdk/room";
 import { get } from "http";
 import { use, useEffect, useRef, useState } from "react";
-import { useRecoilState, useSetRecoilState } from "recoil";
+import { useRecoilState, useRecoilValue, useSetRecoilState } from "recoil";
 
-const useAudioVideo = (token: string | null) => {
+const useAudioVideo = () => {
+  const token = useRecoilValue(roomTokenAtom);
   const localVideo = useRef<HTMLVideoElement>(null);
   const localAudio = useRef<HTMLAudioElement>(null);
   const recordedChunks = useRef<BlobPart[]>([]);
@@ -18,30 +24,49 @@ const useAudioVideo = (token: string | null) => {
   const [mediaRecorder, setMediaRecorder] = useState<MediaRecorder | null>(
     null
   );
-  const [tmpRecordedAudio, setTmpRecordedAudio] = useState<Blob | null>(null);
+  const [isVideoRecording, setIsVideoRecording] = useState(false);
+  const memberType = useRecoilValue(memberTypeAtom);
+  const [currentTime, setCurrentTime] = useRecoilState(currentTimeAtom);
+  const intervalRef = useRef<NodeJS.Timeout | null>(null);
   useEffect(() => {
     const initialize = async () => {
-      if (token == null || localVideo.current == null) {
+      if (memberType === "speaker") {
+        if (token == null || localVideo.current == null) {
+          console.log("token or localVideo is null");
+          return;
+        }
+        const stream =
+          await SkyWayStreamFactory.createMicrophoneAudioAndCameraStream();
+
+        stream.video.attach(localVideo.current);
+        await localVideo.current.play();
+        setMediaStream(stream);
+        await loadModels();
+      } else if (memberType === "listener") {
+        if (token === null) {
+          console.log("token is null");
+          return;
+        }
+        const stream =
+          await SkyWayStreamFactory.createMicrophoneAudioAndCameraStream();
+        setMediaStream(stream);
+      } else {
+        console.log("memberType is null");
         return;
       }
-
-      const stream =
-        await SkyWayStreamFactory.createMicrophoneAudioAndCameraStream();
-
-      stream.video.attach(localVideo.current);
-      // stream.audio.attach(localAudio.current);
-      await localVideo.current.play();
-      setMediaStream(stream);
-      await loadModels();
+      console.log("create stream");
     };
 
     initialize();
   }, [token, localVideo]);
 
-  const startAudioRecord = async () => {
+  const startVideoRecord = async () => {
     try {
       // マイクからの新しい MediaStream を取得
-      const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+      const stream = await navigator.mediaDevices.getUserMedia({
+        video: true,
+        audio: true,
+      });
       // MediaRecorder をこの MediaStream で初期化
       const recorder = new MediaRecorder(stream);
       recorder.ondataavailable = (event) => {
@@ -50,52 +75,47 @@ const useAudioVideo = (token: string | null) => {
         }
       };
       recorder.start();
+      intervalRef.current = setInterval(() => {
+        setCurrentTime((prev) => prev + 1);
+      }, 1000);
+      setIsVideoRecording(true);
       console.log("Audio recording started");
       setMediaRecorder(recorder);
     } catch (error) {
       console.error("Audio recording error:", error);
     }
   };
-  const stopAudioRecord = () => {
+  const stopVideoRecord = () => {
     if (mediaRecorder) {
       mediaRecorder.stop();
-
+      setIsVideoRecording(false);
+      if (intervalRef.current) clearInterval(intervalRef.current);
       // MediaRecorder の録音が停止した後に実行されるイベント
       mediaRecorder.onstop = () => {
         // BlobPart[] 型の recordedChunks から Blob を作成
         const blob = new Blob(recordedChunks.current, { type: "audio/webm" });
-        setTmpRecordedAudio(blob); // Blob をステートに保存
+        // DetectVoiceEmotion(blob).catch((e) => console.error(e));
+        // setTmpRecordedAudio(blob); // Blob をステートに保存
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement("a");
+        document.body.appendChild(a);
+        a.style.display = "none";
+        a.href = url;
+        a.download = "video.webm";
+        a.click();
+        window.URL.revokeObjectURL(url);
         console.log("Audio recording stopped");
         recordedChunks.current = []; // チャンクをリセット
       };
     }
   };
 
-  const downloadAudio = () => {
-    if (tmpRecordedAudio) {
-      const url = URL.createObjectURL(tmpRecordedAudio);
-      const a = document.createElement("a");
-      document.body.appendChild(a);
-      a.style.display = "none";
-      a.href = url;
-      a.download = "audio.webm";
-      a.click();
-      window.URL.revokeObjectURL(url);
-    }
-  };
-
-  const processAudio = () => {
-    if (!tmpRecordedAudio) return;
-    convertAudio(tmpRecordedAudio).catch((e) => console.error(e));
-  };
-
   return {
     localVideo,
     localAudio,
-    startAudioRecord,
-    stopAudioRecord,
-    downloadAudio,
-    processAudio,
+    startVideoRecord,
+    stopVideoRecord,
+    isVideoRecording,
   };
 };
 

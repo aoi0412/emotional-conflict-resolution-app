@@ -15,23 +15,37 @@ export const userMediaStreamAtom = atom<{
   dangerouslyAllowMutability: true,
 });
 
-// export const userAudioAtom = atom<LocalAudioStream | null>({
-//   key: "userAudio",
-//   default: null,
-//   dangerouslyAllowMutability: true,
-// });
+export const memberTypeAtom = atom<"speaker" | "listener" | null>({
+  key: "memberType",
+  default: null,
+});
+
+export const currentTimeAtom = atom<number>({
+  key: "currentTime",
+  default: 0,
+});
+
+export const userNameAtom = atom<string | null>({
+  key: "userName",
+  default: null,
+});
+
+export const roomTokenAtom = atom<string | null>({
+  key: "roomToken",
+  default: null,
+});
+
+export const isRecordingAtom = atom<boolean>({
+  key: "isRecording",
+  default: false,
+});
+
+export const roomDocIdAtom = atom<string | null>({
+  key: "roomDocId",
+  default: null,
+});
 
 export const isModelLoadedAtom = atom<boolean>({
   key: "isModelLoaded",
   default: false,
 });
-
-// export const memberAudioListAtom = atom<
-//   {
-//     AudioStream: RemoteAudioStream;
-//     buttonElement: HTMLButtonElement;
-//   }[]
-// >({
-//   key: "memberAudioList",
-//   default: [],
-// });

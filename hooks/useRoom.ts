@@ -1,5 +1,11 @@
 import { isCorrectUserName } from "@/functions/utils";
-import { userMediaStreamAtom } from "@/recoil";
+import {
+  memberTypeAtom,
+  roomDocIdAtom,
+  roomTokenAtom,
+  userMediaStreamAtom,
+  userNameAtom,
+} from "@/recoil";
 import {
   LocalP2PRoomMember,
   LocalStream,
@@ -8,17 +14,19 @@ import {
   SkyWayRoom,
 } from "@skyway-sdk/room";
 import { useRef } from "react";
-import { useRecoilValue } from "recoil";
+import { useRecoilState, useRecoilValue, useSetRecoilState } from "recoil";
+import { createRoom } from "@/db/createRoom";
+import { joinRoom } from "@/db/joinRoom";
 
-const useRoom = (token: string | null) => {
+const useRoom = () => {
   const userMediaStream = useRecoilValue(userMediaStreamAtom);
   const targetElement = useRef<HTMLDivElement>(null);
+  const token = useRecoilValue(roomTokenAtom);
+  const [roomId, setRoomId] = useRecoilState(roomDocIdAtom);
+  const setUserName = useSetRecoilState(userNameAtom);
+  const memberType = useRecoilValue(memberTypeAtom);
 
-  const joinInRoom = async (roomName: string, myName: string) => {
-    if (!roomName) {
-      alert("ルーム名を入力してください");
-      return;
-    }
+  const joinInRoom = async (myName: string) => {
     if (!myName) {
       alert("名前を入力してください");
       return;
@@ -34,14 +42,30 @@ const useRoom = (token: string | null) => {
       alert("カメラとマイクの使用を許可してください");
       return;
     }
+    let tmp: string | null = null;
+    if (memberType === "speaker") {
+      const tmpRoomId = await createRoom(myName);
+      setRoomId(tmpRoomId);
+      tmp = tmpRoomId;
+    } else if (memberType === "listener") {
+      if (roomId == null) {
+        alert("roomId is null");
+        return;
+      }
+      joinRoom(myName, roomId);
+      tmp = roomId;
+    } else {
+      alert("memberType is null");
+      return;
+    }
+    setUserName(myName);
     const context = await SkyWayContext.Create(token);
     console.log("context is", context);
     const room = await SkyWayRoom.FindOrCreate(context, {
       type: "p2p",
-      name: roomName,
+      name: tmp,
     });
     console.log("room is", room);
-
     let tmpMyId = await room.join({ name: myName });
 
     await tmpMyId.publish(userMediaStream.audio);

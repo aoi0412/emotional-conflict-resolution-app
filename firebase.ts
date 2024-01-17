@@ -1,5 +1,5 @@
 import { getApp, getApps, initializeApp } from "firebase/app";
-import { initializeFirestore } from "firebase/firestore";
+import { getFirestore, initializeFirestore } from "firebase/firestore";
 
 const firebaseConfig = {
   apiKey: process.env.NEXT_PUBLIC_FIREBASE_API_KEY || "",
@@ -16,4 +16,7 @@ initializeFirestore(firebase, {
   ignoreUndefinedProperties: true,
 });
 
-export const firebaseApp = firebase;
+const firebaseApp = firebase;
+
+const db = getFirestore(firebaseApp);
+export { db };

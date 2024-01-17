@@ -15,5 +15,5 @@ export const faceDetectHandler = async (video: HTMLVideoElement) => {
     .detectAllFaces(video, new faceapi.TinyFaceDetectorOptions())
     .withFaceExpressions();
   console.log(detections[0].expressions.angry);
-  return detections;
+  return detections[0].expressions;
 };

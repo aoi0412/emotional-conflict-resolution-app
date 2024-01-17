@@ -1,11 +1,14 @@
 "use client";
+import { roomTokenAtom } from "@/recoil";
 import { SkyWayAuthToken, nowInSec, uuidV4 } from "@skyway-sdk/room";
 import { useEffect, useState } from "react";
+import { useSetRecoilState } from "recoil";
 
 const useToken = () => {
   const appId = process.env.NEXT_PUBLIC_SKYWAY_APP_ID;
   const secretKey = process.env.NEXT_PUBLIC_SKYWAY_SECRET_KEY;
-  const [token, setToken] = useState<string | null>(null);
+  // const [token, setToken] = useState<string | null>(null);
+  const setToken = useSetRecoilState(roomTokenAtom);
   useEffect(() => {
     if (!appId || !secretKey) return;
     const tmpToken = new SkyWayAuthToken({
@@ -52,7 +55,6 @@ const useToken = () => {
     }).encode(secretKey);
     setToken(tmpToken);
   }, []);
-  return { token };
 };
 
 export default useToken;

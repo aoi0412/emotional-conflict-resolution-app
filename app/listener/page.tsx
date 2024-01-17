@@ -2,7 +2,7 @@
 import { RecoilRoot } from "recoil";
 import dynamic from "next/dynamic";
 
-const Test = dynamic(() => import("@/components/pages/speaker"), {
+const Listener = dynamic(() => import("@/components/pages/listener"), {
   ssr: false,
 });
 
@@ -10,7 +10,7 @@ export default function Home() {
   return (
     <RecoilRoot>
       <div>
-        <Test />
+        <Listener />
       </div>
     </RecoilRoot>
   );
