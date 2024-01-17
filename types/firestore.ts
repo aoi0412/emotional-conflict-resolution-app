@@ -16,9 +16,7 @@ export type InsertRoomData = {
 
 export type RecordData = {
   roomId: string;
-  speaker: string;
   speakerEmotion: BaseEmotion;
-  listener: string;
   listenerEmotion: BaseEmotion | null;
   faceEmotion: FaceEmotion;
   voiceEmotion: VoiceEmotion;
@@ -28,9 +26,7 @@ export type RecordData = {
 export type InsertRecordData = {
   recordId: string;
   roomId: string;
-  speaker: string;
   speakerEmotion: BaseEmotion;
-  listener: string;
   listenerEmotion: BaseEmotion | null;
   faceEmotion: FaceEmotion;
   voiceEmotion: VoiceEmotion;

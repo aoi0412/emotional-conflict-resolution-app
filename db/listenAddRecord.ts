@@ -9,8 +9,7 @@ export const listenAddRecord = async (
   const unsubscribe = onSnapshot(q, (querySnapshot) => {
     querySnapshot.docChanges().forEach((change) => {
       if (change.type === "added") {
-        const data = change.doc.data();
-        onAdd(data);
+        onAdd(change.doc);
         console.log("New record: ", change.doc.data());
         console.log(change);
       }

@@ -13,8 +13,6 @@ export const addRecord = async (props: RecordData) => {
   const insertData: InsertRecordData = {
     recordId: "",
     roomId: props.roomId,
-    speaker: props.speaker,
-    listener: "",
     speakerEmotion: props.speakerEmotion,
     listenerEmotion: null,
     faceEmotion: props.faceEmotion,

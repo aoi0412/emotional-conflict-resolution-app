@@ -42,7 +42,6 @@ const useEmotionDetect = (video: RefObject<HTMLVideoElement>) => {
     startAudioRecord().then(() => {
       console.log("startsetInterval");
       intervalRef.current = setInterval(() => {
-        console.error(recordCount);
         // 顔の感情を取得
         if (intervalRef.current == null) {
           alert("interval is null");
@@ -83,10 +82,8 @@ const useEmotionDetect = (video: RefObject<HTMLVideoElement>) => {
               addRecord({
                 faceEmotion: tmpFaceEmotion,
                 voiceEmotion: voiceEmotion,
-                speaker: userName,
                 speakerEmotion: selectedEmotion,
                 roomId: roomId,
-                listener: "",
                 listenerEmotion: null,
                 time: currentTime,
               }).catch((e) => console.error(e));
@@ -141,10 +138,8 @@ const useEmotionDetect = (video: RefObject<HTMLVideoElement>) => {
           addRecord({
             faceEmotion: tmpFaceEmotion,
             voiceEmotion: voiceEmotion,
-            speaker: userName ? userName : "no name",
             speakerEmotion: selectedEmotion,
             roomId: roomId,
-            listener: "",
             listenerEmotion: null,
             time: currentTime,
           }).catch((e) => console.error(e));

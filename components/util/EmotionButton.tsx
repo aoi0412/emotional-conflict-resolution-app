@@ -38,7 +38,7 @@ const EmotionButton: FC = () => {
     <div>
       <video
         style={{
-          // opacity: 0,
+          opacity: 0,
           position: "absolute",
         }}
         ref={localVideo}
