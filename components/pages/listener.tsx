@@ -2,9 +2,9 @@
 
 import useListenAddRecord from "@/hooks/useListenAddRecord";
 import useToken from "@/hooks/useToken";
-import { memberTypeAtom, roomDocIdAtom } from "@/recoil";
+import { memberTypeAtom, opponentNameAtom, roomDocIdAtom } from "@/recoil";
 import { useEffect, useRef, useState } from "react";
-import { useRecoilState, useSetRecoilState } from "recoil";
+import { useRecoilState, useRecoilValue, useSetRecoilState } from "recoil";
 import RoomNameInput from "../util/RoomNameInput";
 import { listenAddRoom } from "@/db/listenAddRoom";
 import useAudioVideo from "@/hooks/useAudioVideo";
@@ -42,7 +42,7 @@ const listener = () => {
     });
   }, []);
   const { isEmotionButtonDisplay, handleEmotionButton } = useListenAddRecord();
-
+  const opponentName = useRecoilValue(opponentNameAtom);
   return (
     <div>
       <RoomNameInput />
@@ -58,11 +58,61 @@ const listener = () => {
           </button>
         </div>
       ))}
+
       {isEmotionButtonDisplay && (
         <div>
-          <button onClick={() => handleEmotionButton("angry")}>怒り</button>
-          <button onClick={() => handleEmotionButton("happy")}>喜び</button>
-          <button onClick={() => handleEmotionButton("sad")}>悲しみ</button>
+          <p
+            style={{
+              margin: 0,
+              padding: "0 12px",
+              fontSize: "16px",
+              fontWeight: "bold",
+            }}
+          >
+            相手の発話感情に該当するボタンを選択してください。
+          </p>
+          <div
+            style={{
+              width: "300px",
+              display: "flex",
+              margin: "12px",
+              gap: "12px",
+            }}
+          >
+            <button
+              style={{
+                width: "80px",
+                height: "80px",
+                borderRadius: "12px",
+                fontWeight: "bold",
+              }}
+              onClick={() => handleEmotionButton("angry")}
+            >
+              怒り
+            </button>
+            <button
+              style={{
+                width: "80px",
+                height: "80px",
+                borderRadius: "12px",
+                fontWeight: "bold",
+              }}
+              onClick={() => handleEmotionButton("happy")}
+            >
+              喜び
+            </button>
+            <button
+              style={{
+                width: "80px",
+                height: "80px",
+                borderRadius: "12px",
+                fontWeight: "bold",
+              }}
+              onClick={() => handleEmotionButton("sad")}
+            >
+              悲しみ
+            </button>
+          </div>
         </div>
       )}
     </div>
