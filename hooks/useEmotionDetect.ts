@@ -4,7 +4,6 @@ import { RefObject, useRef, useState } from "react";
 import { faceDetectHandler } from "@/functions/faceEmotion";
 import useVoiceEmotion from "./useVoiceEmotion";
 import { addRecord } from "@/db/addRecord";
-import { RecordData } from "@/types/firestore";
 import { useRecoilValue } from "recoil";
 import { currentTimeAtom, roomDocIdAtom, userNameAtom } from "@/recoil";
 

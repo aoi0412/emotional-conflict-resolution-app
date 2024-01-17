@@ -9,9 +9,7 @@ const Listener = dynamic(() => import("@/components/pages/listener"), {
 export default function Home() {
   return (
     <RecoilRoot>
-      <div>
-        <Listener />
-      </div>
+      <Listener />
     </RecoilRoot>
   );
 }

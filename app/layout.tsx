@@ -16,7 +16,18 @@ export default function RootLayout({
 }) {
   return (
     <html lang="en">
-      <body>{children}</body>
+      <body
+        style={{
+          margin: 0,
+          width: "100vw",
+          height: "100vh",
+          display: "flex",
+          flexDirection: "column",
+          flex: 1,
+        }}
+      >
+        {children}
+      </body>
     </html>
   );
 }

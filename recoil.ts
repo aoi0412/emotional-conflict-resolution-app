@@ -35,6 +35,11 @@ export const roomTokenAtom = atom<string | null>({
   default: null,
 });
 
+export const opponentNameAtom = atom<string | null>({
+  key: "opponentName",
+  default: null,
+});
+
 export const isRecordingAtom = atom<boolean>({
   key: "isRecording",
   default: false,

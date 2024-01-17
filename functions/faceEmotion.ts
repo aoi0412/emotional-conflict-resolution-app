@@ -14,6 +14,13 @@ export const faceDetectHandler = async (video: HTMLVideoElement) => {
   const detections = await faceapi
     .detectAllFaces(video, new faceapi.TinyFaceDetectorOptions())
     .withFaceExpressions();
+  if (detections.length === 0) {
+    Promise.reject("no face detected");
+  }
+  // expressionsがあるかどうか
+  if (detections[0].expressions === undefined) {
+    Promise.reject("no expressions");
+  }
   console.log(detections[0].expressions.angry);
   return detections[0].expressions;
 };

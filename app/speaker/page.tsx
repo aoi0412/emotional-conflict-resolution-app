@@ -9,9 +9,7 @@ const Speaker = dynamic(() => import("@/components/pages/speaker"), {
 export default function Home() {
   return (
     <RecoilRoot>
-      <div>
-        <Speaker />
-      </div>
+      <Speaker />
     </RecoilRoot>
   );
 }

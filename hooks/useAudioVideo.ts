@@ -6,14 +6,9 @@ import {
   roomTokenAtom,
   userMediaStreamAtom,
 } from "@/recoil";
-import {
-  LocalAudioStream,
-  LocalVideoStream,
-  SkyWayStreamFactory,
-} from "@skyway-sdk/room";
-import { get } from "http";
-import { use, useEffect, useRef, useState } from "react";
-import { useRecoilState, useRecoilValue, useSetRecoilState } from "recoil";
+import { SkyWayStreamFactory } from "@skyway-sdk/room";
+import { useEffect, useRef, useState } from "react";
+import { useRecoilState, useRecoilValue } from "recoil";
 
 const useAudioVideo = () => {
   const token = useRecoilValue(roomTokenAtom);

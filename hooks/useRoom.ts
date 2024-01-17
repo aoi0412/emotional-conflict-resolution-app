@@ -1,6 +1,7 @@
 import { isCorrectUserName } from "@/functions/utils";
 import {
   memberTypeAtom,
+  opponentNameAtom,
   roomDocIdAtom,
   roomTokenAtom,
   userMediaStreamAtom,
@@ -26,22 +27,23 @@ const useRoom = () => {
   const [roomId, setRoomId] = useRecoilState(roomDocIdAtom);
   const setUserName = useSetRecoilState(userNameAtom);
   const memberType = useRecoilValue(memberTypeAtom);
+  const [opponentName, setOpponentName] = useRecoilState(opponentNameAtom);
 
-  const joinInRoom = async (myName: string) => {
+  const joinInRoom = async (myName: string): Promise<boolean> => {
     if (!myName) {
       alert("名前を入力してください");
-      return;
+      return false;
     } else if (isCorrectUserName(myName) === false) {
       alert("名前に使用できない文字が含まれています。(英語で入力してください)");
-      return;
+      return false;
     }
     if (!token) {
       alert("トークンを取得してください");
-      return;
+      return false;
     }
     if (!userMediaStream?.audio || !userMediaStream?.video) {
       alert("カメラとマイクの使用を許可してください");
-      return;
+      return false;
     }
     let tmp: string | null = null;
     if (memberType === "speaker") {
@@ -51,13 +53,13 @@ const useRoom = () => {
     } else if (memberType === "listener") {
       if (roomId == null) {
         alert("roomId is null");
-        return;
+        return false;
       }
       joinRoom(myName, roomId);
       tmp = roomId;
     } else {
       alert("memberType is null");
-      return;
+      return false;
     }
     setUserName(myName);
     const context = await SkyWayContext.Create(token);
@@ -79,6 +81,7 @@ const useRoom = () => {
       console.log("onStreamPublished", e);
       subscribe(e.publication, tmpMyId);
     });
+    return true;
   };
 
   const subscribe = (
@@ -90,10 +93,11 @@ const useRoom = () => {
     const audioElement = document.createElement("audio");
     audioElement.autoplay = true;
     audioElement.controls = true;
-    subscribeButton.textContent = `${publication.publisher.name}:${publication.contentType}`;
+    subscribeButton.textContent = `マイクをオンにする`;
+    if (publication.publisher.name) setOpponentName(publication.publisher.name);
     if (targetElement.current == null) return;
-    targetElement.current.appendChild(subscribeButton);
     targetElement.current.appendChild(audioElement);
+    targetElement.current.appendChild(subscribeButton);
     subscribeButton.onclick = async () => {
       if (!myId) {
         alert("ルームに参加してください");
