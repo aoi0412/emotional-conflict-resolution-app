@@ -2,6 +2,7 @@ import axios from "axios";
 import { fetchFile } from "@ffmpeg/util";
 import { FFmpeg } from "@ffmpeg/ffmpeg";
 import { VoiceEmotion } from "@/types/emotion";
+import { checkIsEmpathEnable } from "@/db/checkIsEmpathEnable";
 
 // bodyはapikeyにAPIキーを入れ，wavに音声ファイルを入れる
 // 音声はPCMWAve形式でないといけない
@@ -16,25 +17,35 @@ export const voiceEmotion = async (wavFile: File) => {
   const formData = new FormData();
   formData.append("apikey", process.env.NEXT_PUBLIC_EMPATH_API_KEY || "");
   formData.append("wav", wavFile);
-  //   const res = await axios.post(
-  //     "https://api.webempath.net/v2/analyzeWav",
-  //     formData,
-  //     {
-  //       headers: {
-  //         "Content-Type": "multipart/form-data",
-  //       },
-  //     }
-  //   );
-  //   console.log("res is", res.data);
-  // const result = res.data;
-  const result: VoiceEmotion = {
+  let result: VoiceEmotion = {
     error: 0,
-    calm: 14,
+    calm: 0,
     anger: 0,
-    joy: 18,
-    sorrow: 17,
-    energy: 1,
+    joy: 0,
+    sorrow: 0,
+    energy: 0,
   };
+  await checkIsEmpathEnable()
+    .then(async (isEnable) => {
+      console.log("is EmpathAPI enable", isEnable);
+      if (isEnable) {
+        const res = await axios.post(
+          "https://api.webempath.net/v2/analyzeWav",
+          formData,
+          {
+            headers: {
+              "Content-Type": "multipart/form-data",
+            },
+          }
+        );
+        console.log("res is", res.data);
+        result = res.data;
+      }
+    })
+    .catch((e) => {
+      console.error(e);
+    });
+
   return result;
 };
 

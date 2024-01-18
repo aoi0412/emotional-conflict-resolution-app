@@ -46,18 +46,19 @@ const listener = () => {
   return (
     <div>
       <RoomNameInput />
-      {roomList.map((room) => (
-        <div key={room.roomId}>
-          <button
-            onClick={() => setRoomId(room.roomId)}
-            style={{
-              backgroundColor: roomId === room.roomId ? "red" : "white",
-            }}
-          >
-            {room.speaker}のルーム
-          </button>
-        </div>
-      ))}
+      {!opponentName &&
+        roomList.map((room) => (
+          <div key={room.roomId}>
+            <button
+              onClick={() => setRoomId(room.roomId)}
+              style={{
+                backgroundColor: roomId === room.roomId ? "red" : "white",
+              }}
+            >
+              {room.speaker}のルーム
+            </button>
+          </div>
+        ))}
 
       {isEmotionButtonDisplay && (
         <div>

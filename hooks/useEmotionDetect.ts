@@ -68,7 +68,7 @@ const useEmotionDetect = (video: RefObject<HTMLVideoElement>) => {
             const voiceEmotion = tmpVoiceEmotion.current;
             // const faceEmotion = tmpFaceEmotion.current[0];
             // FaceEmotionの平均を取る
-            let tmp: FaceEmotion = {
+            let tmpFace: FaceEmotion = {
               angry: 0,
               disgusted: 0,
               fearful: 0,
@@ -78,52 +78,66 @@ const useEmotionDetect = (video: RefObject<HTMLVideoElement>) => {
               neutral: 0,
             };
             tmpFaceEmotion.current.forEach((faceEmotion) => {
-              tmp.angry += faceEmotion.angry;
-              tmp.disgusted += faceEmotion.disgusted;
-              tmp.fearful += faceEmotion.fearful;
-              tmp.happy += faceEmotion.happy;
-              tmp.sad += faceEmotion.sad;
-              tmp.surprised += faceEmotion.surprised;
-              tmp.neutral += faceEmotion.neutral;
+              tmpFace.angry += faceEmotion.angry;
+              tmpFace.disgusted += faceEmotion.disgusted;
+              tmpFace.fearful += faceEmotion.fearful;
+              tmpFace.happy += faceEmotion.happy;
+              tmpFace.sad += faceEmotion.sad;
+              tmpFace.surprised += faceEmotion.surprised;
+              tmpFace.neutral += faceEmotion.neutral;
             });
-            tmp.angry /= tmpFaceEmotion.current.length;
-            tmp.disgusted /= tmpFaceEmotion.current.length;
-            tmp.fearful /= tmpFaceEmotion.current.length;
-            tmp.happy /= tmpFaceEmotion.current.length;
-            tmp.sad /= tmpFaceEmotion.current.length;
-            tmp.surprised /= tmpFaceEmotion.current.length;
-            tmp.neutral /= tmpFaceEmotion.current.length;
+            tmpFace.angry /= tmpFaceEmotion.current.length;
+            tmpFace.disgusted /= tmpFaceEmotion.current.length;
+            tmpFace.fearful /= tmpFaceEmotion.current.length;
+            tmpFace.happy /= tmpFaceEmotion.current.length;
+            tmpFace.sad /= tmpFaceEmotion.current.length;
+            tmpFace.surprised /= tmpFaceEmotion.current.length;
+            tmpFace.neutral /= tmpFaceEmotion.current.length;
+
+            let tmpVoice: VoiceEmotion = {
+              error: tmpVoiceEmotion.current.error
+                ? tmpVoiceEmotion.current.error
+                : 0,
+              calm: tmpVoiceEmotion.current.calm
+                ? tmpVoiceEmotion.current.calm
+                : 0,
+              anger: tmpVoiceEmotion.current.anger
+                ? tmpVoiceEmotion.current.anger
+                : 0,
+              joy: tmpVoiceEmotion.current.joy
+                ? tmpVoiceEmotion.current.joy
+                : 0,
+              sorrow: tmpVoiceEmotion.current.sorrow
+                ? tmpVoiceEmotion.current.sorrow
+                : 0,
+              energy: tmpVoiceEmotion.current.energy
+                ? tmpVoiceEmotion.current.energy
+                : 0,
+            };
+
+            tmpVoice.calm /= 50;
+            tmpVoice.anger /= 50;
+            tmpVoice.joy /= 50;
+            tmpVoice.sorrow /= 50;
+            tmpVoice.energy /= 50;
 
             //   emotionData.current = { faceEmotion, voiceEmotion };
             setEmotionData((_) => {
-              // const tmpFaceEmotion: FaceEmotion = {
-              //   angry: faceEmotion.angry,
-              //   disgust: faceEmotion.disgusted,
-              //   fear: faceEmotion.fearful,
-              //   happy: faceEmotion.happy,
-              //   sad: faceEmotion.sad,
-              //   surprise: faceEmotion.surprised,
-              //   neutral: faceEmotion.neutral,
-              // };
-
               addRecord({
-                faceEmotion: tmp,
-                voiceEmotion: voiceEmotion,
+                faceEmotion: tmpFace,
+                voiceEmotion: tmpVoice,
                 speakerEmotion: selectedEmotion,
                 roomId: roomId,
                 listenerEmotion: null,
                 time: currentTime,
               }).catch((e) => console.error(e));
-              return { faceEmotion: tmp, voiceEmotion };
+              return { faceEmotion: tmpFace, voiceEmotion };
             });
             console.log(
-              `voiceEmotion is ${voiceEmotion}, faceEmotion is ${tmp}`
+              `voiceEmotion is ${tmpVoice}, faceEmotion is ${tmpFace}`
             );
           }
           tmpFaceEmotion.current = [];
-          // firebaseに保存
-          // 画面提示
-          // 聞き手に提示
           recordCount = 1;
         } else {
           recordCount++;
