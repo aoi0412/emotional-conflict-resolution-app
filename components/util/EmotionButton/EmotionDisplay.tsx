@@ -12,12 +12,12 @@ const EmotionDisplay: FC<Props> = ({ faceEmotion, voiceEmotion }) => {
       <h2>表情感情</h2>
       <div>
         <p>angry:{faceEmotion && faceEmotion.angry}</p>
-        <p>disgusted: {faceEmotion && faceEmotion.disgust}</p>
-        <p>fearful: {faceEmotion && faceEmotion.fear}</p>
+        <p>disgusted: {faceEmotion && faceEmotion.disgusted}</p>
+        <p>fearful: {faceEmotion && faceEmotion.fearful}</p>
         <p>happy: {faceEmotion && faceEmotion.happy}</p>
         <p>neutral: {faceEmotion && faceEmotion.neutral}</p>
         <p>sad: {faceEmotion && faceEmotion.sad}</p>
-        <p>surprised: {faceEmotion && faceEmotion.surprise}</p>
+        <p>surprised: {faceEmotion && faceEmotion.surprised}</p>
       </div>
       <h2>音声感情</h2>
       <div>

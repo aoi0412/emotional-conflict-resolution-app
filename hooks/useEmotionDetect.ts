@@ -66,30 +66,58 @@ const useEmotionDetect = (video: RefObject<HTMLVideoElement>) => {
           console.log(tmpFaceEmotion.current && tmpVoiceEmotion.current);
           if (tmpFaceEmotion.current && tmpVoiceEmotion.current) {
             const voiceEmotion = tmpVoiceEmotion.current;
-            const faceEmotion = tmpFaceEmotion.current[0];
+            // const faceEmotion = tmpFaceEmotion.current[0];
+            // FaceEmotionの平均を取る
+            let tmp: FaceEmotion = {
+              angry: 0,
+              disgusted: 0,
+              fearful: 0,
+              happy: 0,
+              sad: 0,
+              surprised: 0,
+              neutral: 0,
+            };
+            tmpFaceEmotion.current.forEach((faceEmotion) => {
+              tmp.angry += faceEmotion.angry;
+              tmp.disgusted += faceEmotion.disgusted;
+              tmp.fearful += faceEmotion.fearful;
+              tmp.happy += faceEmotion.happy;
+              tmp.sad += faceEmotion.sad;
+              tmp.surprised += faceEmotion.surprised;
+              tmp.neutral += faceEmotion.neutral;
+            });
+            tmp.angry /= tmpFaceEmotion.current.length;
+            tmp.disgusted /= tmpFaceEmotion.current.length;
+            tmp.fearful /= tmpFaceEmotion.current.length;
+            tmp.happy /= tmpFaceEmotion.current.length;
+            tmp.sad /= tmpFaceEmotion.current.length;
+            tmp.surprised /= tmpFaceEmotion.current.length;
+            tmp.neutral /= tmpFaceEmotion.current.length;
+
             //   emotionData.current = { faceEmotion, voiceEmotion };
             setEmotionData((_) => {
-              const tmpFaceEmotion: FaceEmotion = {
-                angry: faceEmotion.angry,
-                disgust: faceEmotion.disgusted,
-                fear: faceEmotion.fearful,
-                happy: faceEmotion.happy,
-                sad: faceEmotion.sad,
-                surprise: faceEmotion.surprised,
-                neutral: faceEmotion.neutral,
-              };
+              // const tmpFaceEmotion: FaceEmotion = {
+              //   angry: faceEmotion.angry,
+              //   disgust: faceEmotion.disgusted,
+              //   fear: faceEmotion.fearful,
+              //   happy: faceEmotion.happy,
+              //   sad: faceEmotion.sad,
+              //   surprise: faceEmotion.surprised,
+              //   neutral: faceEmotion.neutral,
+              // };
+
               addRecord({
-                faceEmotion: tmpFaceEmotion,
+                faceEmotion: tmp,
                 voiceEmotion: voiceEmotion,
                 speakerEmotion: selectedEmotion,
                 roomId: roomId,
                 listenerEmotion: null,
                 time: currentTime,
               }).catch((e) => console.error(e));
-              return { faceEmotion: tmpFaceEmotion, voiceEmotion };
+              return { faceEmotion: tmp, voiceEmotion };
             });
             console.log(
-              `voiceEmotion is ${voiceEmotion}, faceEmotion is ${faceEmotion}`
+              `voiceEmotion is ${voiceEmotion}, faceEmotion is ${tmp}`
             );
           }
           tmpFaceEmotion.current = [];
@@ -123,11 +151,11 @@ const useEmotionDetect = (video: RefObject<HTMLVideoElement>) => {
         setEmotionData((_) => {
           const tmpFaceEmotion: FaceEmotion = {
             angry: faceEmotion.angry,
-            disgust: faceEmotion.disgusted,
-            fear: faceEmotion.fearful,
+            disgusted: faceEmotion.disgusted,
+            fearful: faceEmotion.fearful,
             happy: faceEmotion.happy,
             sad: faceEmotion.sad,
-            surprise: faceEmotion.surprised,
+            surprised: faceEmotion.surprised,
             neutral: faceEmotion.neutral,
           };
           if (roomId == null) {

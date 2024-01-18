@@ -10,11 +10,11 @@ export type VoiceEmotion = {
 
 export type FaceEmotion = {
   angry: number;
-  disgust: number;
-  fear: number;
+  disgusted: number;
+  fearful: number;
   happy: number;
   sad: number;
-  surprise: number;
+  surprised: number;
   neutral: number;
 };
 // export type FaceEmotion = faceapi.FaceExpressions;
