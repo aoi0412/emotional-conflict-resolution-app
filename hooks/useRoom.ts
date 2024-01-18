@@ -72,44 +72,46 @@ const useRoom = () => {
     let tmpMyId = await room.join({ name: myName });
 
     await tmpMyId.publish(userMediaStream.audio);
-
+    const subscribe = (
+      publication: RoomPublication<LocalStream>,
+      myId: LocalP2PRoomMember
+    ) => {
+      console.log("aiueo");
+      console.log("publisherId", publication.publisher.id, "myId", myId.id);
+      if (publication.publisher.id === myId.id) return;
+      const subscribeButton = document.createElement("button");
+      const audioElement = document.createElement("audio");
+      audioElement.autoplay = true;
+      audioElement.controls = true;
+      subscribeButton.textContent = `マイクをオンにする`;
+      if (publication.publisher.name)
+        setOpponentName(publication.publisher.name);
+      if (targetElement.current == null) return;
+      targetElement.current.appendChild(audioElement);
+      targetElement.current.appendChild(subscribeButton);
+      subscribeButton.onclick = async () => {
+        if (!myId) {
+          alert("ルームに参加してください");
+          return;
+        }
+        console.log("subscribe", publication.id);
+        const { stream } = await myId.subscribe(publication.id);
+        if (stream.contentType !== "audio") {
+          alert("音声以外のメディアはサポートしていません");
+          return;
+        }
+        stream.attach(audioElement);
+        // userMediaStream?.audio?.attach(audioElement);
+      };
+    };
     room.publications.forEach((publication) => {
       console.log("publication", publication);
       subscribe(publication, tmpMyId);
     });
     room.onStreamPublished.add((e) => {
-      console.log("onStreamPublished", e);
       subscribe(e.publication, tmpMyId);
     });
     return true;
-  };
-
-  const subscribe = (
-    publication: RoomPublication<LocalStream>,
-    myId: LocalP2PRoomMember
-  ) => {
-    if (myId && publication.publisher.id === myId.id) return;
-    const subscribeButton = document.createElement("button");
-    const audioElement = document.createElement("audio");
-    audioElement.autoplay = true;
-    audioElement.controls = true;
-    subscribeButton.textContent = `マイクをオンにする`;
-    if (publication.publisher.name) setOpponentName(publication.publisher.name);
-    if (targetElement.current == null) return;
-    targetElement.current.appendChild(audioElement);
-    targetElement.current.appendChild(subscribeButton);
-    subscribeButton.onclick = async () => {
-      if (!myId) {
-        alert("ルームに参加してください");
-        return;
-      }
-      const { stream } = await myId.subscribe(publication.id);
-      if (stream.contentType !== "audio") {
-        alert("音声以外のメディアはサポートしていません");
-        return;
-      }
-      userMediaStream?.audio?.attach(audioElement);
-    };
   };
 
   return { joinInRoom, targetElement };
