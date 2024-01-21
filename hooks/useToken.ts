@@ -11,10 +11,12 @@ const useToken = () => {
   const setToken = useSetRecoilState(roomTokenAtom);
   useEffect(() => {
     if (!appId || !secretKey) return;
+    console.log("iat", nowInSec());
+    console.log("exp", nowInSec());
     const tmpToken = new SkyWayAuthToken({
       jti: uuidV4(),
       iat: nowInSec(),
-      exp: nowInSec() + 60 + 60 + 24,
+      exp: nowInSec() + 60 * 60,
       scope: {
         app: {
           id: appId,
