@@ -21,6 +21,7 @@ export type RecordData = {
   faceEmotion: FaceEmotion;
   voiceEmotion: VoiceEmotion;
   time: number;
+  isDetected: boolean;
 };
 
 export type InsertRecordData = {
@@ -31,5 +32,6 @@ export type InsertRecordData = {
   faceEmotion: FaceEmotion;
   voiceEmotion: VoiceEmotion;
   time: number;
+  isDetected: boolean;
   createdAt: FieldValue;
 };

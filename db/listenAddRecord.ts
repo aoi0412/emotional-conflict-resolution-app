@@ -18,6 +18,7 @@ export const listenAddRecord = async (
           faceEmotion: data.faceEmotion,
           voiceEmotion: data.voiceEmotion,
           time: data.time,
+          isDetected: data.isDetected,
         };
         onAdd(tmp);
         console.log("New record: ", change.doc.data());

@@ -1,4 +1,5 @@
 import { db } from "@/firebase";
+import { detectFunc } from "@/functions/detectFunc";
 import { BaseEmotion, FaceEmotion, VoiceEmotion } from "@/types/emotion";
 import { InsertRecordData, RecordData } from "@/types/firestore";
 import {
@@ -18,6 +19,10 @@ export const addRecord = async (props: RecordData) => {
     faceEmotion: props.faceEmotion,
     voiceEmotion: props.voiceEmotion,
     time: props.time,
+    isDetected: detectFunc({
+      faceEmotion: props.faceEmotion,
+      voiceEmotion: props.voiceEmotion,
+    }),
     createdAt: serverTimestamp(),
   };
   addDoc(collection(db, "rooms", props.roomId, "records"), insertData)

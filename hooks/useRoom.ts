@@ -21,6 +21,7 @@ import { useRecoilState, useRecoilValue, useSetRecoilState } from "recoil";
 import { createRoom } from "@/db/createRoom";
 import { joinRoom } from "@/db/joinRoom";
 import { listenAddRecord } from "@/db/listenAddRecord";
+import { endBefore } from "firebase/firestore";
 
 const useRoom = () => {
   const userMediaStream = useRecoilValue(userMediaStreamAtom);
@@ -35,18 +36,21 @@ const useRoom = () => {
     null
   );
   useEffect(() => {
-    window.addEventListener("beforeunload", (event: BeforeUnloadEvent) => {
+    const tmpFunc = () => {
       if (memberType === "speaker") {
+        alert("close");
         myMemberData?.leave();
         roomData?.close();
         // メッセージを設定
-        const confirmationMessage =
-          "本当にこのページを離れますか？※ページを離れると作成した部屋が削除されます";
-        return confirmationMessage;
       } else {
+        alert("leave");
         myMemberData?.leave();
       }
-    });
+    };
+    console.log("window");
+    return () => {
+      tmpFunc();
+    };
   }, []);
 
   const joinInRoom = async (myName: string): Promise<boolean> => {
