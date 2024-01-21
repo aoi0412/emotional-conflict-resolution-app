@@ -8,13 +8,15 @@ import {
   userNameAtom,
 } from "@/recoil";
 import {
+  LocalAudioStream,
   LocalP2PRoomMember,
   LocalStream,
+  P2PRoom,
   RoomPublication,
   SkyWayContext,
   SkyWayRoom,
 } from "@skyway-sdk/room";
-import { useRef } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useRecoilState, useRecoilValue, useSetRecoilState } from "recoil";
 import { createRoom } from "@/db/createRoom";
 import { joinRoom } from "@/db/joinRoom";
@@ -22,12 +24,30 @@ import { listenAddRecord } from "@/db/listenAddRecord";
 
 const useRoom = () => {
   const userMediaStream = useRecoilValue(userMediaStreamAtom);
-  const targetElement = useRef<HTMLDivElement>(null);
   const token = useRecoilValue(roomTokenAtom);
   const [roomId, setRoomId] = useRecoilState(roomDocIdAtom);
   const setUserName = useSetRecoilState(userNameAtom);
   const memberType = useRecoilValue(memberTypeAtom);
   const [opponentName, setOpponentName] = useRecoilState(opponentNameAtom);
+  const audioElement = useRef<HTMLAudioElement>(null);
+  const [roomData, setRoomData] = useState<P2PRoom | null>(null);
+  const [myMemberData, setMyMemberData] = useState<LocalP2PRoomMember | null>(
+    null
+  );
+  useEffect(() => {
+    window.addEventListener("beforeunload", (event: BeforeUnloadEvent) => {
+      if (memberType === "speaker") {
+        myMemberData?.leave();
+        roomData?.close();
+        // メッセージを設定
+        const confirmationMessage =
+          "本当にこのページを離れますか？※ページを離れると作成した部屋が削除されます";
+        return confirmationMessage;
+      } else {
+        myMemberData?.leave();
+      }
+    });
+  }, []);
 
   const joinInRoom = async (myName: string): Promise<boolean> => {
     if (!myName) {
@@ -68,44 +88,36 @@ const useRoom = () => {
       type: "p2p",
       name: tmp,
     });
+    setRoomData(room);
     console.log("room is", room);
     let tmpMyId = await room.join({ name: myName });
+    setMyMemberData(tmpMyId);
 
     const publication = await tmpMyId.publish(userMediaStream.audio);
-    const subscribe = (
+    const subscribe = async (
       publication: RoomPublication<LocalStream>,
       myId: LocalP2PRoomMember
     ) => {
-      console.log("aiueo");
       console.log("publisherId", publication.publisher.id, "myId", myId.id);
-      if (publication.publisher.id === myId.id) return;
-      const subscribeButton = document.createElement("button");
-      const audioElement = document.createElement("audio");
-      audioElement.autoplay = true;
-      audioElement.controls = true;
-      subscribeButton.textContent = `マイクをオンにする`;
+      if (publication.publisher.id === myId.id || !audioElement.current) return;
+      audioElement.current.autoplay = true;
+      audioElement.current.controls = true;
       if (publication.publisher.name)
         setOpponentName(publication.publisher.name);
-      if (targetElement.current == null) return;
-      targetElement.current.appendChild(audioElement);
-      targetElement.current.appendChild(subscribeButton);
-      subscribeButton.onclick = async () => {
-        if (!myId) {
-          alert("ルームに参加してください");
-          return;
-        }
-        console.log("subscribe", publication.id);
-        const { stream, subscription } = await myId.subscribe(publication.id);
-        subscription.onConnectionStateChanged.add((e) => {
-          console.log("onConnectionStateChanged", e);
-        });
-        if (stream.contentType !== "audio") {
-          alert("音声以外のメディアはサポートしていません");
-          return;
-        }
-        stream.attach(audioElement);
-        // userMediaStream?.audio?.attach(audioElement);
-      };
+      if (!myId) {
+        alert("ルームに参加してください");
+        return;
+      }
+      console.log("subscribe", publication.id);
+      const { stream, subscription } = await myId.subscribe(publication.id);
+      subscription.onConnectionStateChanged.add((e) => {
+        console.log("onConnectionStateChanged", e);
+      });
+      if (stream.contentType !== "audio") {
+        alert("音声以外のメディアはサポートしていません");
+        return;
+      }
+      stream.attach(audioElement.current);
     };
     room.publications.forEach((publication) => {
       console.log("publication", publication);
@@ -120,8 +132,7 @@ const useRoom = () => {
     });
     return true;
   };
-
-  return { joinInRoom, targetElement };
+  return { joinInRoom, audioElement };
 };
 
 export default useRoom;

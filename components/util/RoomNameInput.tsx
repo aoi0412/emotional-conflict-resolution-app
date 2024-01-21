@@ -12,8 +12,8 @@ import {
 const RoomNameInput: FC = () => {
   const [myName, setMyName] = useState<string>("");
   const [isJoined, setIsJoined] = useState<boolean>(false);
-  const { joinInRoom, targetElement } = useRoom();
-  // const memberType = useRecoilValue(memberTypeAtom);
+  const { joinInRoom, audioElement } = useRoom();
+  const memberType = useRecoilValue(memberTypeAtom);
   const roomId = useRecoilValue(roomDocIdAtom);
   const buttonHandler = () => {
     joinInRoom(myName).then((result) => {
@@ -61,7 +61,9 @@ const RoomNameInput: FC = () => {
             }}
             onClick={buttonHandler}
           >
-            ルームを作成
+            {memberType === "listener"
+              ? "ルームに入室する"
+              : "ルームを作成する"}
           </button>
         </div>
       )}
@@ -73,8 +75,9 @@ const RoomNameInput: FC = () => {
           alignItems: "center",
           justifyContent: "end",
         }}
-        ref={targetElement}
-      ></div>
+      >
+        <audio ref={audioElement} />
+      </div>
     </div>
   );
 };

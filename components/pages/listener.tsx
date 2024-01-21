@@ -8,6 +8,14 @@ import { useRecoilState, useRecoilValue, useSetRecoilState } from "recoil";
 import RoomNameInput from "../util/RoomNameInput";
 import { listenAddRoom } from "@/db/listenAddRoom";
 import useAudioVideo from "@/hooks/useAudioVideo";
+import { getRoom } from "@/db/getRoom";
+import { Timestamp } from "firebase/firestore";
+import dayjs, { extend } from "dayjs";
+import relativeTime from "dayjs/plugin/relativeTime";
+import "dayjs/locale/ja";
+
+extend(relativeTime);
+dayjs.locale("ja");
 
 const listener = () => {
   useToken();
@@ -18,26 +26,34 @@ const listener = () => {
     {
       roomId: string;
       speaker: string;
+      createdAt: Timestamp;
     }[]
   >([]);
   useEffect(() => {
     setMemberType("listener");
-    listenAddRoom((querySnapshot) => {
-      const tmpChanges = querySnapshot.docChanges();
-      if (tmpChanges.length >= 4) return;
-      tmpChanges.forEach((change) => {
-        if (change.type === "modified") {
-          const data = change.doc.data();
-          let roomId = data.roomId;
-          if (roomId === "") {
-            roomId = change.doc.id;
+    getRoom().then((result) => {
+      setRoomList([...result]);
+      listenAddRoom((querySnapshot) => {
+        const tmpChanges = querySnapshot.docChanges();
+        if (tmpChanges.length >= 4) return;
+        tmpChanges.forEach((change) => {
+          if (change.type === "modified") {
+            const data = change.doc.data();
+            let roomId = data.roomId;
+            if (roomId === "") {
+              roomId = change.doc.id;
+            }
+            let tmpRoomList = [
+              ...roomList,
+              {
+                roomId: roomId,
+                speaker: data.speaker,
+                createdAt: data.createdAt,
+              },
+            ];
+            setRoomList(tmpRoomList);
           }
-          let tmpRoomList = [
-            ...roomList,
-            { roomId: roomId, speaker: data.speaker },
-          ];
-          setRoomList(tmpRoomList);
-        }
+        });
       });
     });
   }, []);
@@ -55,7 +71,9 @@ const listener = () => {
                 backgroundColor: roomId === room.roomId ? "red" : "white",
               }}
             >
-              {room.speaker}のルーム
+              {room.speaker}のルーム:
+              {dayjs(room.createdAt.toDate()).fromNow()}
+              に作成
             </button>
           </div>
         ))}
