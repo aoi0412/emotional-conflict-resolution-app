@@ -71,7 +71,7 @@ const useRoom = () => {
     console.log("room is", room);
     let tmpMyId = await room.join({ name: myName });
 
-    await tmpMyId.publish(userMediaStream.audio);
+    const publication = await tmpMyId.publish(userMediaStream.audio);
     const subscribe = (
       publication: RoomPublication<LocalStream>,
       myId: LocalP2PRoomMember
@@ -95,7 +95,10 @@ const useRoom = () => {
           return;
         }
         console.log("subscribe", publication.id);
-        const { stream } = await myId.subscribe(publication.id);
+        const { stream, subscription } = await myId.subscribe(publication.id);
+        subscription.onConnectionStateChanged.add((e) => {
+          console.log("onConnectionStateChanged", e);
+        });
         if (stream.contentType !== "audio") {
           alert("音声以外のメディアはサポートしていません");
           return;
@@ -110,6 +113,10 @@ const useRoom = () => {
     });
     room.onStreamPublished.add((e) => {
       subscribe(e.publication, tmpMyId);
+    });
+
+    publication.onConnectionStateChanged.add((e) => {
+      console.log("onConnectionStateChanged", e);
     });
     return true;
   };
