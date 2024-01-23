@@ -4,6 +4,14 @@ const nextConfig = {
   images: {
     domains: ["localhost", "emotional-conflict-resolution-app.vercel.app"], // 画像を置いているドメイン
   },
+  webpack: (config, { isServer }) => {
+    if (!isServer) {
+      config.resolve.fallback = {
+        fs: false,
+      };
+    }
+    return config;
+  },
 };
 
 module.exports = nextConfig;
