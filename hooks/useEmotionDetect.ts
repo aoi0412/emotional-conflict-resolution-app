@@ -130,6 +130,7 @@ const useEmotionDetect = (video: RefObject<HTMLVideoElement>) => {
                 roomId: roomId,
                 listenerEmotion: null,
                 time: currentTime,
+                isDetected: false,
               }).catch((e) => console.error(e));
               return { faceEmotion: tmpFace, voiceEmotion };
             });
@@ -183,6 +184,7 @@ const useEmotionDetect = (video: RefObject<HTMLVideoElement>) => {
             roomId: roomId,
             listenerEmotion: null,
             time: currentTime,
+            isDetected: false,
           }).catch((e) => console.error(e));
           return { faceEmotion: tmpFaceEmotion, voiceEmotion };
         });
