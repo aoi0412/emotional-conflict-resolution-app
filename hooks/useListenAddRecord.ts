@@ -20,23 +20,18 @@ const useListenAddRecord = () => {
   useEffect(() => {
     console.log("useListenAddRecord");
     if (roomId == null) return;
-    listenAddRecord(roomId, (doc) => {
-      const data = doc.data();
-      let recordId = data.recordId;
-      if (recordId === "") {
-        recordId = doc.id;
-      }
+    listenAddRecord(roomId, (doc, recordId) => {
       console.log("recordId", recordId);
       if (isEmotionButtonDisplay) {
         updateListenerEmotion({
           selectedEmotion: null,
-          roomId: data.roomId,
+          roomId: doc.roomId,
           recordId: recordId,
         });
       }
       setIsEmotionButtonDisplay(true);
       const tmpRecordData: Props = {
-        roomId: data.roomId,
+        roomId: doc.roomId,
         recordId: recordId,
       };
       // setRecordData(tmpRecordData);

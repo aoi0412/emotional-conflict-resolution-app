@@ -4,13 +4,15 @@ import { DocumentData, collection, onSnapshot } from "firebase/firestore";
 
 export const listenAddRecord = async (
   roomId: string,
-  onAdd: (data: RecordData) => void
+  onAdd: (data: RecordData, recordId: string) => void
 ) => {
   const q = collection(db, "rooms", roomId, "records");
   const unsubscribe = onSnapshot(q, (querySnapshot) => {
     querySnapshot.docChanges().forEach((change) => {
       if (change.type === "added") {
         const data = change.doc.data();
+
+        const recordId = change.doc.id;
         const tmp: RecordData = {
           roomId: roomId,
           speakerEmotion: data.speakerEmotion,
@@ -20,7 +22,7 @@ export const listenAddRecord = async (
           time: data.time,
           isDetected: data.isDetected,
         };
-        onAdd(tmp);
+        onAdd(tmp, recordId);
         console.log("New record: ", change.doc.data());
         console.log(change);
       }
