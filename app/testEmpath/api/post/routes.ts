@@ -6,14 +6,15 @@ export async function POST(request: NextRequest, response: NextResponse) {
   // return new Response(request.method, { status: 200 });
   if (request.method === "POST") {
     try {
+      const formData = new FormData();
+      formData.append("file", body.file);
       const response = await fetch(process.env.NEXT_PUBLIC_EMPATH_URL || "", {
         method: "POST",
         headers: {
-          "Cross-Allow-Origin": "*",
           // ここに必要なヘッダーを設定
           ApiKey: process.env.NEXT_PUBLIC_EMPATH_API_KEY || "", // 適切なAPIキーに置き換えてください
         },
-        body: JSON.stringify(request.body), // クライアントから受け取ったリクエストボディをそのまま使用
+        body: formData, // クライアントから受け取ったリクエストボディをそのまま使用
       });
 
       if (!response.ok) {
