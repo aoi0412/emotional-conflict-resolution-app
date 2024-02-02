@@ -8,7 +8,7 @@ const page = () => {
   useEffect(() => {
     const getEmotion = async () => {
       input.current?.addEventListener("change", async (e: any) => {
-        const file = e.target.files[0];
+        const file = e.target.files[0] as File;
         console.log(file);
 
         try {
@@ -27,9 +27,7 @@ const page = () => {
             console.log(data.talkUnits);
             console.log(data);
           } else {
-            console.error(
-              `Failed to upload the file. StatusCode: ${response.status}`
-            );
+            console.error(`Failed to upload the file. StatusCode: ${response.status}`);
             console.log("Response from server:", response);
             console.error(await response.text());
           }
