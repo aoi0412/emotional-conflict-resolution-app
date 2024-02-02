@@ -5,6 +5,7 @@ export async function GET() {
 }
 
 export async function POST(request: NextRequest, response: NextResponse) {
+  console.log(request);
   const formData = await request.formData();
 
   if (request.method === "POST") {
