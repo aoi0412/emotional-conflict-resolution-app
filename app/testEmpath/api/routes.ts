@@ -30,6 +30,8 @@ export async function POST(request: NextRequest, response: NextResponse) {
     }
   } else {
     // POSTメソッド以外のリクエストを拒否
-    return new Response("Method Not Allowed", { status: 405 });
+    return new Response(`Method Not Allowed ${request.method}`, {
+      status: 405,
+    });
   }
 }
