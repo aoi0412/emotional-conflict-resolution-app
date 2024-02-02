@@ -21,9 +21,9 @@ export async function POST(request: NextRequest, response: NextResponse) {
       });
 
       if (!response.ok) {
+        console.error(await response.text());
         throw new Error(`Error from external API: ${response.statusText}`);
       }
-
       const data = await response.json();
       console.log("data", data);
       return NextResponse.json(JSON.stringify(data));
