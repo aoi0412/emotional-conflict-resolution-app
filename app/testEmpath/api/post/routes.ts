@@ -10,7 +10,6 @@ export async function POST(request: NextRequest, response: NextResponse) {
         method: "POST",
         headers: {
           // ここに必要なヘッダーを設定
-          "Content-Type": "application/json",
           ApiKey: process.env.NEXT_PUBLIC_EMPATH_API_KEY || "", // 適切なAPIキーに置き換えてください
         },
         body: JSON.stringify(request.body), // クライアントから受け取ったリクエストボディをそのまま使用
