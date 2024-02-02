@@ -10,11 +10,11 @@ export async function POST(request: NextRequest, response: NextResponse) {
 
   if (request.method === "POST") {
     try {
-      const response = await fetch(process.env.EMPATH_URL || "", {
+      const response = await fetch(process.env.NEXT_PUBLIC_EMPATH_URL || "", {
         method: "POST",
         headers: {
           // ここに必要なヘッダーを設定
-          ApiKey: process.env.EMPATH_API_KEY || "", // 適切なAPIキーに置き換えてください
+          ApiKey: process.env.NEXT_PUBLIC_EMPATH_API_KEY || "", // 適切なAPIキーに置き換えてください
         },
         body: formData, // クライアントから受け取ったリクエストボディをそのまま使用
       });
