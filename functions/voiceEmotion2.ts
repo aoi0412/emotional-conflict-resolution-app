@@ -17,7 +17,8 @@ export async function uploadFileToChunkEndpoint(file: File) {
       console.error(
         `Failed to upload the file. StatusCode: ${response.status}`
       );
-      console.error(await response.text());
+
+      console.error("aaaaa", await response.text());
     }
   } catch (error: any) {
     console.error("Error uploading file:", error.message);
