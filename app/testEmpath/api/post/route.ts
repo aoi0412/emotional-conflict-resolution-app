@@ -10,6 +10,7 @@ export async function POST(request: NextRequest, response: NextResponse) {
 
   if (request.method === "POST") {
     try {
+      console.log(process.env.NEXT_PUBLIC_EMPATH_API_KEY);
       const response = await fetch(process.env.NEXT_PUBLIC_EMPATH_URL || "", {
         method: "POST",
         headers: {
