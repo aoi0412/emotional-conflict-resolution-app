@@ -15,7 +15,7 @@ const page = () => {
           const formData = new FormData();
           formData.append("file", file);
 
-          const response = await fetch("/testEmpath/api", {
+          const response = await fetch("/testEmpath/api/post", {
             method: "POST",
             body: formData,
           });
@@ -25,6 +25,7 @@ const page = () => {
             console.log("File uploaded successfully!");
             console.log("Response from server:");
             console.log(data.talkUnits);
+            console.log(data);
           } else {
             console.error(
               `Failed to upload the file. StatusCode: ${response.status}`

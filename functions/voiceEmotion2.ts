@@ -3,7 +3,7 @@ export async function uploadFileToChunkEndpoint(file: File) {
     const formData = new FormData();
     formData.append("file", file);
 
-    const response = await fetch("/testEmpath/api", {
+    const response = await fetch("/testEmpath/api/post", {
       method: "POST",
       body: formData,
     });
