@@ -7,9 +7,11 @@ import { BaseEmotion } from "@/types/emotion";
 import { useRecoilValue } from "recoil";
 import { currentTimeAtom, opponentNameAtom } from "@/recoil";
 
-const EmotionButton: FC = () => {
+const EmotionButton: FC<{
+  memberType: "speaker" | "listener" | null;
+}> = ({ memberType }) => {
   const { localVideo, startVideoRecord, stopVideoRecord, isVideoRecording } =
-    useAudioVideo();
+    useAudioVideo(memberType);
   const { startRecord, stopRecord, emotionData, isRecording } =
     useEmotionDetect(localVideo);
   // const [selectedEmotionPref, setSelectedEmotionPref] =

@@ -1,16 +1,11 @@
 import { loadModels } from "@/functions/faceEmotion";
 import { DetectVoiceEmotion } from "@/functions/voiceEmotion";
-import {
-  currentTimeAtom,
-  memberTypeAtom,
-  roomTokenAtom,
-  userMediaStreamAtom,
-} from "@/recoil";
+import { currentTimeAtom, roomTokenAtom, userMediaStreamAtom } from "@/recoil";
 import { SkyWayStreamFactory } from "@skyway-sdk/room";
 import { useEffect, useRef, useState } from "react";
 import { useRecoilState, useRecoilValue } from "recoil";
 
-const useAudioVideo = () => {
+const useAudioVideo = (memberType: "listener" | "speaker" | null) => {
   const token = useRecoilValue(roomTokenAtom);
   const localVideo = useRef<HTMLVideoElement>(null);
   const localAudio = useRef<HTMLAudioElement>(null);
@@ -20,31 +15,31 @@ const useAudioVideo = () => {
     null
   );
   const [isVideoRecording, setIsVideoRecording] = useState(false);
-  const memberType = useRecoilValue(memberTypeAtom);
+  // const memberType = useRecoilValue(memberTypeAtom);
   const [currentTime, setCurrentTime] = useRecoilState(currentTimeAtom);
   const intervalRef = useRef<NodeJS.Timeout | null>(null);
   useEffect(() => {
     const initialize = async () => {
-      if (memberType === "speaker") {
-        if (token == null || localVideo.current == null) {
-          console.log("token or localVideo is null");
-          return;
-        }
-        const stream =
-          await SkyWayStreamFactory.createMicrophoneAudioAndCameraStream();
+      if (token == null || localVideo.current == null) {
+        console.log("token or localVideo is null");
+        return;
+      }
+      const stream =
+        await SkyWayStreamFactory.createMicrophoneAudioAndCameraStream();
 
-        stream.video.attach(localVideo.current);
-        await localVideo.current.play();
-        setMediaStream(stream);
+      stream.video.attach(localVideo.current);
+      await localVideo.current.play();
+      setMediaStream(stream);
+      if (memberType === "speaker") {
         await loadModels();
       } else if (memberType === "listener") {
-        if (token === null) {
-          console.log("token is null");
-          return;
-        }
-        const stream =
-          await SkyWayStreamFactory.createMicrophoneAudioAndCameraStream();
-        setMediaStream(stream);
+        // if (token === null) {
+        //   console.log("token is null");
+        //   return;
+        // }
+        // const stream =
+        //   await SkyWayStreamFactory.createMicrophoneAudioAndCameraStream();
+        // setMediaStream(stream);
       } else {
         console.log("memberType is null");
         return;

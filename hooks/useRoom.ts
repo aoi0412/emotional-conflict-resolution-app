@@ -1,6 +1,5 @@
 import { isCorrectUserName } from "@/functions/utils";
 import {
-  memberTypeAtom,
   opponentNameAtom,
   roomDocIdAtom,
   roomTokenAtom,
@@ -8,7 +7,6 @@ import {
   userNameAtom,
 } from "@/recoil";
 import {
-  LocalAudioStream,
   LocalP2PRoomMember,
   LocalStream,
   P2PRoom,
@@ -20,17 +18,16 @@ import { useEffect, useRef, useState } from "react";
 import { useRecoilState, useRecoilValue, useSetRecoilState } from "recoil";
 import { createRoom } from "@/db/createRoom";
 import { joinRoom } from "@/db/joinRoom";
-import { listenAddRecord } from "@/db/listenAddRecord";
-import { endBefore } from "firebase/firestore";
 
-const useRoom = () => {
+const useRoom = (memberType: "listener" | "speaker" | null) => {
   const userMediaStream = useRecoilValue(userMediaStreamAtom);
   const token = useRecoilValue(roomTokenAtom);
   const [roomId, setRoomId] = useRecoilState(roomDocIdAtom);
   const setUserName = useSetRecoilState(userNameAtom);
-  const memberType = useRecoilValue(memberTypeAtom);
-  const [opponentName, setOpponentName] = useRecoilState(opponentNameAtom);
+  // const memberType = useRecoilValue(memberTypeAtom);
+  const [opponentName, setOpponentName] = useState<string | null>(null);
   const audioElement = useRef<HTMLAudioElement>(null);
+  const videoElement = useRef<HTMLVideoElement>(null);
   const [roomData, setRoomData] = useState<P2PRoom | null>(null);
   const [myMemberData, setMyMemberData] = useState<LocalP2PRoomMember | null>(
     null
@@ -97,17 +94,27 @@ const useRoom = () => {
     let tmpMyId = await room.join({ name: myName });
     setMyMemberData(tmpMyId);
 
-    const publication = await tmpMyId.publish(userMediaStream.audio);
+    await tmpMyId.publish(userMediaStream.audio);
+    const publication = await tmpMyId.publish(userMediaStream.video);
     const subscribe = async (
       publication: RoomPublication<LocalStream>,
       myId: LocalP2PRoomMember
     ) => {
       console.log("publisherId", publication.publisher.id, "myId", myId.id);
-      if (publication.publisher.id === myId.id || !audioElement.current) return;
+      if (publication.publisher.id === myId.id) return;
+
+      if (audioElement.current == null || videoElement.current == null) {
+        alert("audioElement or videoElement is null");
+        return;
+      }
       audioElement.current.autoplay = true;
       audioElement.current.controls = true;
+
+      videoElement.current.autoplay = true;
+      videoElement.current.playsInline = true;
       if (publication.publisher.name)
         setOpponentName(publication.publisher.name);
+      else setOpponentName("相手");
       if (!myId) {
         alert("ルームに参加してください");
         return;
@@ -117,11 +124,12 @@ const useRoom = () => {
       subscription.onConnectionStateChanged.add((e) => {
         console.log("onConnectionStateChanged", e);
       });
-      if (stream.contentType !== "audio") {
-        alert("音声以外のメディアはサポートしていません");
+      if (stream.contentType !== "audio" && stream.contentType !== "video") {
+        alert("音声と映像以外のメディアはサポートしていません");
         return;
       }
       stream.attach(audioElement.current);
+      stream.attach(videoElement.current);
     };
     room.publications.forEach((publication) => {
       console.log("publication", publication);
@@ -136,7 +144,7 @@ const useRoom = () => {
     });
     return true;
   };
-  return { joinInRoom, audioElement };
+  return { joinInRoom, opponentName, audioElement, videoElement };
 };
 
 export default useRoom;

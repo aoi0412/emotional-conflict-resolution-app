@@ -15,10 +15,10 @@ export const userMediaStreamAtom = atom<{
   dangerouslyAllowMutability: true,
 });
 
-export const memberTypeAtom = atom<"speaker" | "listener" | null>({
-  key: "memberType",
-  default: null,
-});
+// export const memberTypeAtom = atom<"speaker" | "listener" | null>({
+//   key: "memberType",
+//   default: null,
+// });
 
 export const currentTimeAtom = atom<number>({
   key: "currentTime",
