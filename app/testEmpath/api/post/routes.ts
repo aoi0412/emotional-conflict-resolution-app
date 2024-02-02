@@ -3,7 +3,7 @@ import { NextRequest, NextResponse } from "next/server";
 export async function POST(request: NextRequest, response: NextResponse) {
   const body = await request.json();
 
-  console.log("POST request", body.name);
+  return new Response(request.method, { status: 200 });
   if (request.method === "POST") {
     try {
       const response = await fetch(process.env.NEXT_PUBLIC_EMPATH_URL || "", {
