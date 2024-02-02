@@ -29,6 +29,7 @@ const page = () => {
             console.error(
               `Failed to upload the file. StatusCode: ${response.status}`
             );
+            console.log("Response from server:", response);
             console.error(await response.text());
           }
         } catch (error: any) {

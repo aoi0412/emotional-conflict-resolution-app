@@ -9,6 +9,7 @@ export async function POST(request: NextRequest, response: NextResponse) {
       const response = await fetch(process.env.NEXT_PUBLIC_EMPATH_URL || "", {
         method: "POST",
         headers: {
+          "Cross-Allow-Origin": "*",
           // ここに必要なヘッダーを設定
           ApiKey: process.env.NEXT_PUBLIC_EMPATH_API_KEY || "", // 適切なAPIキーに置き換えてください
         },
@@ -25,7 +26,7 @@ export async function POST(request: NextRequest, response: NextResponse) {
       //   response.status(200).json(data); // 外部APIからのレスポンスをクライアントに返す
     } catch (error) {
       console.error("Error:", error);
-      return new Response("Internal Server Error", { status: 500 });
+      return new Response(`Internal Server Error${error}`, { status: 500 });
     }
   } else {
     // POSTメソッド以外のリクエストを拒否
